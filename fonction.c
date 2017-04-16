@@ -24,7 +24,7 @@ struct Type{
     int vit;// vitesse du tire en case / seconde
     int cad;// cadence de tire ex: 0.5
     char tir;// apparence du tire
-    int deg;
+    int deg;// 			les degats engendre
     int vie;// vie par defaut
 
     int lcycle;
@@ -84,7 +84,7 @@ while( ( t[i]!=' ' || t[i]!='\n') && i<10){
 }
 t=t+i+2;
 int rep;
-if (a==0) rep=(int)strtol(tab,NULL,10);
+if (a==0) rep=(int)strtol(tab,NULL,10);//atoi
 if (a==1) rep= 0.5;//double
 return rep;
 }
@@ -92,31 +92,33 @@ return rep;
 
 
 
-Type** type(int max){
+Type** type(){
 int fd_v;
 char i='0';int j=0;	
-char vaiseaux[]="vaiseaux-";	
-/*
+char vaiseaux[]="space_invaders/vaiseaux/-";	
+
 int max=0;
 do{
- vaiseaux[8]=i;//int i en char a ? //ou //char vaiseaux[10]=sprintf("vaiseaux%c",i);
- fd_v=open(vaiseaux,O_RDONLY);
- if (fd_v!=-1){
-	close(fd_v); max++;
- }
- i++;
+ 	vaiseaux[24]=i;
+//int i en char a ? //ou //char vaiseaux[10]=sprintf("vaiseaux%c",i);
+ 	fd_v=open(vaiseaux,O_RDONLY);
+ 	if (fd_v!=-1){
+		close(fd_v); max++;
+	 }
+	 i++;
 }while(fd_v!=-1);
-*/
+
 Type** types=malloc(max*sizeof(Type*));
 	
 do{
- 	vaiseaux[8]=i;//int i en char a ? //ou //char vaiseaux[10]=sprintf("vaiseaux%c",i);
+ 	vaiseaux[24]=i;
+//int i en char a ? //ou //char vaiseaux[10]=sprintf("vaiseaux%c",i);
  	fd_v=open(vaiseaux,O_RDONLY);
  	if (fd_v!=-1){
 		types[j]=type01(fd_v);
  	}
  	i++;j++;
-}while(j<max);//fd_v!=-1);
+}while(j<max);
 return types;
 }
 
@@ -200,7 +202,7 @@ free(V->cycle[1]);
 free(V->cycle);
 
 
-for(i=0;i<V.h;i++){
+for(i=0;i<V->h;i++){
 	free(V->visuel[i]);
 }
 free(V->visuel);
