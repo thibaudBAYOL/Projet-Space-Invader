@@ -17,7 +17,7 @@ typedef struct Type Type;
 
 Type* type01(int fd_v);
 char* deroulement();
-int lire(char* t,int a);
+int lire(char* t,int a,int* l);
 Type** type(int* max);
 
 struct Type{
@@ -75,14 +75,14 @@ return numNiveau;
 }
 
 
-int lire(char* t,int a){
+int lire(char* t,int a,int* l){
 int i=0;char tab[10];
 
-while( ( t[i]!=' ' || t[i]!='\n') && i<10){
+while(  t[i]!=' ' && t[i]!='\n' && i<10){
 	tab[i]=t[i];i++;
 }
-t=t+i+2;
-int rep;
+(*l)=i+2;// adresse
+int rep; printf("%s$\n",tab);
 if (a==0) rep=atoi(tab);//(int)strtol(tab,NULL,10);
 if (a==1) rep=atof(tab);//double
 return rep;
@@ -134,32 +134,32 @@ char tab0[max];
 read(fd_v,tab0,max);
 close(fd_v);
 char* tab=tab0;
-	
+int l=0;
 Type type1;
-type1.l=lire(tab,0);
-type1.h=lire(tab,0);
+type1.l=lire(tab,0,&l);tab=tab+l;
+type1.h=lire(tab,0,&l);tab=tab+l;
 
-type1.lcycle =lire(tab,0);
+type1.lcycle =lire(tab,0,&l);tab=tab+l;
 
 int i;
 int* x=malloc (type1.lcycle*sizeof(int));
 for (i=0;i<=(type1.lcycle);i++){
-	x[i]=lire(tab,0);
+	x[i]=lire(tab,0,&l);tab=tab+l;
 }
 
 int* y=malloc (type1.lcycle*sizeof(int));
 for (i=0;i<=type1.lcycle;i++){
-	y[i]=lire(tab,0);
+	y[i]=lire(tab,0,&l);tab=tab+l;
 }
 
 int** cyl=malloc (2*sizeof(char*));
 cyl[0]=x; cyl[1]=y;
 type1.cycle=cyl;
 
-type1.vie=lire(tab,0);
-type1.cad=lire(tab,1);// modif int en double????
-type1.vit=lire(tab,0); printf("\nvit:%d\n",type1.vit);
-type1.deg=lire(tab,0);
+type1.vie=lire(tab,0,&l);tab=tab+l;
+type1.cad=lire(tab,0,&l);tab=tab+l;// modif int en double????
+type1.vit=lire(tab,0,&l);tab=tab+l; printf("\nvit:%d\n",type1.vit);
+type1.deg=lire(tab,0,&l);tab=tab+l;
 type1.tir=tab[0];tab=tab+2;
 
 int j;char* h;
