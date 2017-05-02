@@ -41,11 +41,11 @@ struct Vaisseau{
 };
 
 
-Type** type(int* max);
+Type** type(int* max /*, char* adresse */);
 
-char* deroulement(void);
+char* deroulement(void /* char* adresse? */);
 
-
+Vaisseau** creeUneArmer(int* max /*, char* adresse */, Type** T);
 
 
 

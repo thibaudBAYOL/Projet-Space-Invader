@@ -23,8 +23,8 @@ Type* type01(int fd_v);
 
 
 
-char* deroulement(){
-
+char* deroulement(/* char* adresse? */){
+			 /* adresse */
 int fd_deroulement=open("space_invaders/deroulement",O_RDONLY);
 	if (fd_deroulement==-1)exit(1);
 	int max=lseek(fd_deroulement,0,SEEK_END); max=max-15;
@@ -76,9 +76,9 @@ return rep;
 
 
 
-Type** type(int* max){
+Type** type(int* max /*, char* adresse */ ){
 int fd_v=-1;
-char i='0';	
+char i='0';	 /* adresse */
 char vaiseaux[]="space_invaders/vaisseaux/-";	
 
 *max=0;
@@ -116,8 +116,6 @@ char tab0[max];
 read(fd_v,tab0,max);
 close(fd_v);
   char* tab=tab0;
-
-
 
 
 Type type1;
@@ -168,6 +166,64 @@ return type2;
 
 
 
+Vaisseau** creeUneArmer(int* max /*, char* adresse */, Type** T){	
+int fd_v=-1;
+char i='0';	 /* adresse */
+char vaiseaux[]="space_invaders/niveaux/-";	
+
+*max=0;
+do{
+ 	vaiseaux[23]=i;
+//int i en char a ? //ou //char vaiseaux[10]=sprintf("vaiseaux%c",i);
+ 	fd_v=open(vaiseaux,O_RDONLY);
+ 	if (fd_v!=-1){
+		close(fd_v);
+		(*max)++;
+		i++;
+	 }
+}while(fd_v!=-1);
+
+Vaisseau** V=malloc((*max)*sizeof(Vaisseau*));
+int j=0;i='0'; int maxi =0; int cap=0;int z=0;
+do{
+ 	vaiseaux[25]=i;
+//int i en char a ? //ou //char vaiseaux[10]=sprintf("vaiseaux%c",i);
+ 	fd_v=open(vaiseaux,O_RDONLY);
+		
+ 	maxi= lseek(fd_v,0,SEEK_END);
+		lseek(fd_v,0,SEEK_SET);
+	char tab0[maxi];
+	read(fd_v,tab0,maxi);
+	close(fd_v);
+	char* tab=tab0;
+ 	if (fd_v!=-1){ cap=lire(&tab);
+		V[j]=malloc( (cap)*sizeof(Vaisseau) );
+
+		for (z=0;z<cap;z++){
+		V[j][z].cat=(*T[lire(&tab)]);
+		V[j][z].temp=lire(&tab);
+		V[j][z].x=lire(&tab);
+		V[j][z].y=lire(&tab);
+		V[j][z].vie=V[j][z].cat.vie;
+		}
+
+	}
+ 	i++;j++;
+
+
+
+}while(j<(*max) && fd_v!=-1);
+return V;
+}
+
+
+
+
+
+
+
+
+
 
 //////////////////////////TESTE/////////////////////////////////////
 
@@ -188,12 +244,13 @@ free(tab);//free
 int maxiV;
 Type** V1=type(&maxiV);
 			printf("maxiV=%d\n",maxiV);
+
+//aff(V[z]);
+
 Type* V=V1[0];
 			printf("test:\n");
-
 printf("h:%d\n",V->h);// nb de case en hauteur
 printf("l:%d\n",V->l);// nb de case en largeur
-
 
 printf("%d\n",V->lcycle);
 
