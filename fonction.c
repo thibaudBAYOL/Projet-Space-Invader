@@ -1,4 +1,4 @@
-
+/*
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -11,43 +11,12 @@
 #include <sys/types.h>
        #include <sys/stat.h>
        #include <fcntl.h> // open
+*/
 
-typedef struct Vaisseau Vaisseau;
-typedef struct Type Type;
+#include "fonction.h"
 
-Type* type01(int fd_v);
-char* deroulement();
 int lire(char** t);
 double lire2(char** t);
-Type** type(int* max);
-
-struct Type{
-    int vit;// vitesse du tire en case / seconde
-    double cad;// cadence de tire ex: 0.5
-    char tir;// apparence du tire
-    int deg;// 			les degats engendre
-    int vie;// vie par defaut
-
-    int lcycle;
-    int** cycle;
-    
-    int h;// nb de case en hauteur
-    int l;// nb de case en largeur
-    char** visuel;// aparence du vaiseau
-};
-
-struct Vaisseau{
-    int x;//position x,y
-    int y;
-    int temp;// temps avant son apparition;
-    Type cat;// la categorie de vaiseau (cat: 1, 2, ...)
-    int vie;// le nb de vit reel du vaisseau
-};
-
-
-
-
-
 
 
 char* deroulement(){
@@ -191,6 +160,7 @@ Type* type2=malloc(sizeof(Type));
 
 return type2;
 }
+
 
 
 
