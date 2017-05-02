@@ -1,6 +1,6 @@
 
-#ifndef thibaudSasi_0_menu_h
-#define thibaudSasi_0_menu_h
+#ifndef thibaudSasi_0_f
+#define thibaudSasi_0_f
 
 
 #include <stdio.h>
@@ -40,9 +40,6 @@ struct Vaisseau{
     int vie;// le nb de vit reel du vaisseau
 };
 
-
-
-Type* type01(int fd_v);
 
 Type** type(int* max);
 

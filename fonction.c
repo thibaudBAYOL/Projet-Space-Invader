@@ -17,6 +17,10 @@
 
 int lire(char** t);
 double lire2(char** t);
+Type* type01(int fd_v);
+
+
+
 
 
 char* deroulement(){
@@ -165,7 +169,7 @@ return type2;
 
 
 
-
+//////////////////////////TESTE/////////////////////////////////////
 
 int main(int argc, const char* argv[]){
 
