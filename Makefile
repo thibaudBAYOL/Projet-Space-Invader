@@ -20,8 +20,8 @@ fonction.o: fonction.c fonction.h
 	$(CC) $(CFLAGS) -o fonction.o -c fonction.c 
 
 f: fonction.o 
-	$(CC) $(CFLAGS) -o f fonction.o
-	
+	$(CC) $(CFLAGS) -o f fonction.o 
+
 clean:
 	rm *.o
 
