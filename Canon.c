@@ -3,6 +3,8 @@
   #include <termio.h>
   #include <unistd.h>
 #include <sys/ioctl.h>
+
+#include "fonction.h"
 //#include <conio.h> //_getch()
 
   /* cette fonction reconfigure le terminal, et stocke */

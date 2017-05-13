@@ -1,27 +1,19 @@
-
-
-
-
 CC=gcc
 CFLAGS= -std=gnu99 -Wall -Werror
 
+.PHONY: default clean
 
-
-
-default: f
-	$(CC) $(CFLAGS) jeux.c -o  jeux
-	$(CC) $(CFLAGS) jeuxS.c -o  jeuxS
-	$(CC) $(CFLAGS) Canon.c -o  C
-
-
-
+default: app.exe
 
 fonction.o: fonction.c fonction.h
-	$(CC) $(CFLAGS) -o fonction.o -c fonction.c 
+	$(CC) $(CFLAGS) -o fonction.o -c fonction.c
 
-f: fonction.o 
-	$(CC) $(CFLAGS) -o f fonction.o 
+canon.o: canon.c fonction.h
+	$(CC) $(CFLAGS) -o canon.o -c canon.c
+
+app.exe: canon.o fonction.o
+	$(CC) $(CFLAGS) -o app.exe canon.o fonction.o
 
 clean:
 	rm *.o
-
+	rm app.exe

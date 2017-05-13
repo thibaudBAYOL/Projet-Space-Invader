@@ -243,7 +243,7 @@ return V;
 
 
 //////////////////////////TESTE/////////////////////////////////////
-
+/*
 int main(int argc, const char* argv[]){
 
 //  deroulement
@@ -321,7 +321,7 @@ for (i = 0; i < vais[0][0].cat.h; i++){
 		printf("%c", vais[0][0].cat.visuel[i][j]);
 	}
 	printf("\n");
-}
+}*/
 	/*
 printf("%c", vais[0][0].cat.visuel[0][0]);
 printf("%c", vais[0][0].cat.visuel[0][1]);
@@ -342,8 +342,8 @@ printf("%c", vais[0][0].cat.visuel[2][3]);
 printf("\n");
 printf("%c", vais[0][0].cat.visuel[2][4]);
 //printf("\n");
-*/
+*//*
 return EXIT_SUCCESS;
-}
+}*/
 
 
