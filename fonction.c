@@ -1,4 +1,4 @@
-
+/*
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -11,46 +11,20 @@
 #include <sys/types.h>
        #include <sys/stat.h>
        #include <fcntl.h> // open
+*/
 
-typedef struct Vaisseau Vaisseau;
-typedef struct Type Type;
+#include "fonction.h"
 
+int lire(char** t);
+double lire2(char** t);
 Type* type01(int fd_v);
-char* deroulement();
-int lire(char* t,int a);
-Type** type(int max);
-
-struct Type{
-    int vit;// vitesse du tire en case / seconde
-    int cad;// cadence de tire ex: 0.5
-    char tir;// apparence du tire
-    int deg;// 			les degats engendre
-    int vie;// vie par defaut
-
-    int lcycle;
-    int** cycle;
-    
-    int h;// nb de case en hauteur
-    int l;// nb de case en largeur
-    char** visuel;// aparence du vaiseau
-};
-
-struct Vaisseau{
-    int x;//position x,y
-    int y;
-    int temp;// temps avant son apparition;
-    Type cat;// la categorie de vaiseau (cat: 1, 2, ...)
-    int vie;// le nb de vit reel du vaisseau
-};
 
 
 
 
 
-
-
-char* deroulement(){
-
+char* deroulement(/* char* adresse? */){
+			 /* adresse */
 int fd_deroulement=open("space_invaders/deroulement",O_RDONLY);
 	if (fd_deroulement==-1)exit(1);
 	int max=lseek(fd_deroulement,0,SEEK_END); max=max-15;
@@ -71,96 +45,109 @@ for (i=0;i<=cpt+1 && j<=max;i++){
 	numNiveau[i]=totoNiveau[j];// (si <10)
 	j=j+2;
 }
-numNiveau[i]='-';
 return numNiveau;
 }
 
 
-int lire(char* t,int a){
-int i=0;char* tab[10];
+int lire(char** tt){
+int i=0;char tab[]="          ";
+	char* t=*tt;		
+while(  t[i]!=' ' && t[i]!='\n' && i<10){
+	tab[i]=t[i];i++;			
+}					
+(*tt)=t+i+1;// adresse
+int rep;
+ rep=atoi(tab);//(int)strtol(tab,NULL,10);
+return rep;
+}
 
-while( ( t[i]!=' ' || t[i]!='\n') && i<10){
+double lire2(char** tt){
+int i=0;char tab[10];
+	char* t=*tt;
+while(  t[i]!=' ' && t[i]!='\n' && i<10){
 	tab[i]=t[i];i++;
 }
-t=t+i+2;
-int rep;
-if (a==0) rep=(int)strtol(tab,NULL,10);//atoi
-if (a==1) rep= 0.5;//double
+(*tt)=t+i+1;// adresse
+double rep;
+ rep=atof(tab);//double
 return rep;
 }
 
 
 
 
-Type** type(){
-int fd_v;
-char i='0';int j=0;	
-char vaiseaux[]="space_invaders/vaiseaux/-";	
+Type** type(int* max /*, char* adresse */ ){
+int fd_v=-1;
+char i='0';	 /* adresse */
+char vaiseaux[]="space_invaders/vaisseaux/-";	
 
-int max=0;
+*max=0;
 do{
- 	vaiseaux[24]=i;
+ 	vaiseaux[25]=i;
 //int i en char a ? //ou //char vaiseaux[10]=sprintf("vaiseaux%c",i);
  	fd_v=open(vaiseaux,O_RDONLY);
  	if (fd_v!=-1){
-		close(fd_v); max++;
+		close(fd_v);
+		(*max)++;
+		i++;
 	 }
-	 i++;
 }while(fd_v!=-1);
 
-Type** types=malloc(max*sizeof(Type*));
-	
+Type** types=malloc((*max)*sizeof(Type*));
+int j=0;i='0';
 do{
- 	vaiseaux[24]=i;
+ 	vaiseaux[25]=i;
 //int i en char a ? //ou //char vaiseaux[10]=sprintf("vaiseaux%c",i);
  	fd_v=open(vaiseaux,O_RDONLY);
  	if (fd_v!=-1){
 		types[j]=type01(fd_v);
  	}
  	i++;j++;
-}while(j<max);
+}while(j<(*max) && fd_v!=-1);
 return types;
 }
-
 
 
 Type* type01(int fd_v){
 
 int max= lseek(fd_v,0,SEEK_END);
-char* tab0[max];
+	lseek(fd_v,0,SEEK_SET);
+char tab0[max];
 read(fd_v,tab0,max);
 close(fd_v);
-char* tab=tab0;
+  char* tab=tab0;
+
 
 Type type1;
-type1.l=lire(tab,0);
-type1.h=lire(tab,0);
 
-type1.lcycle =lire(tab,0);
+type1.l=lire(&tab);
+type1.h=lire(&tab);
+
+type1.lcycle =lire(&tab);
 
 int i;
 int* x=malloc (type1.lcycle*sizeof(int));
-for (i=0;i<=(type1.lcycle);i++){
-	x[i]=lire(tab,0);
+for (i=0;i<(type1.lcycle);i++){
+	x[i]=lire(&tab);
 }
 
 int* y=malloc (type1.lcycle*sizeof(int));
-for (i=0;i<=type1.lcycle;i++){
-	y[i]=lire(tab,0);
+for (i=0;i<(type1.lcycle);i++){
+	y[i]=lire(&tab);
 }
 
 int** cyl=malloc (2*sizeof(char*));
 cyl[0]=x; cyl[1]=y;
 type1.cycle=cyl;
 
-type1.vie=lire(tab,0);
-type1.cad=lire(tab,1);// modif int en double????
-type1.vit=lire(tab,0);
-type1.deg=lire(tab,0);
+type1.vie=lire(&tab);
+type1.cad=lire2(&tab);// modif int en double????
+type1.vit=lire(&tab); 
+type1.deg=lire(&tab);
 type1.tir=tab[0];tab=tab+2;
 
 int j;char* h;
-char** vu[type1.h]=malloc(type1.h*sizeof(char*));
+char** vu=malloc(type1.h*sizeof(char*));
 for(i=0;i<type1.h;i++){
 	h=malloc(type1.l*sizeof(char));
 	for(j=0;j<type1.l;j++){
@@ -179,7 +166,66 @@ return type2;
 
 
 
+Vaisseau** creeUneArmer(int* max /*, char* adresse */, Type** T){	
+int fd_v=-1;
+char i='0';	 /* adresse */
+char vaiseaux[]="space_invaders/niveaux/-";	
 
+*max=0;
+do{
+ 	vaiseaux[23]=i;
+//int i en char a ? //ou //char vaiseaux[10]=sprintf("vaiseaux%c",i);
+ 	fd_v=open(vaiseaux,O_RDONLY);
+ 	if (fd_v!=-1){
+		close(fd_v);
+		(*max)++;
+		i++;
+	 }
+}while(fd_v!=-1);
+
+Vaisseau** V=malloc((*max)*sizeof(Vaisseau*));
+int j=0;i='0'; int maxi =0; int cap=0;int z=0;
+do{
+ 	vaiseaux[25]=i;
+//int i en char a ? //ou //char vaiseaux[10]=sprintf("vaiseaux%c",i);
+ 	fd_v=open(vaiseaux,O_RDONLY);
+		
+ 	maxi= lseek(fd_v,0,SEEK_END);
+		lseek(fd_v,0,SEEK_SET);
+	char tab0[maxi];
+	read(fd_v,tab0,maxi);
+	close(fd_v);
+	char* tab=tab0;
+ 	if (fd_v!=-1){ cap=lire(&tab);
+		V[j]=malloc( (cap)*sizeof(Vaisseau) );
+
+		for (z=0;z<cap;z++){
+		V[j][z].cat=(*T[lire(&tab)]);
+		V[j][z].temp=lire(&tab);
+		V[j][z].x=lire(&tab);
+		V[j][z].y=lire(&tab);
+		V[j][z].vie=V[j][z].cat.vie;
+		}
+
+	}
+ 	i++;j++;
+
+
+
+}while(j<(*max) && fd_v!=-1);
+return V;
+}
+
+
+
+
+
+
+
+
+
+
+//////////////////////////TESTE/////////////////////////////////////
 
 int main(int argc, const char* argv[]){
 
@@ -187,16 +233,54 @@ int main(int argc, const char* argv[]){
 			printf("deroulement:\n");
 char* tab=deroulement();
 int i=0;
-			while (tab[i]!='-'){printf("%c ",tab[i]);i++;}printf("\n");
-			while (tab[i]!='\0'){printf("%c ",tab[i]);i++;}printf("\n");
+		while (tab[i]!='\0'){printf("%c:%d ",tab[i],i);i++;}printf("\n");
+
 free(tab);//free
 
 // fin deroulement
 
 // vaiseaux0 Type
+			printf("Type\n");
+int maxiV;
+Type** V1=type(&maxiV);
+			printf("maxiV=%d\n",maxiV);
 
-Type** V1=type(1);
+//aff(V[z]);
+
 Type* V=V1[0];
+			printf("test:\n");
+printf("h:%d\n",V->h);// nb de case en hauteur
+printf("l:%d\n",V->l);// nb de case en largeur
+
+printf("%d\n",V->lcycle);
+
+for (i=0;i<V->lcycle; i++){
+printf("%d ",V->cycle[0][i]);
+    }
+printf("\n");
+for (i=0;i<V->lcycle; i++){
+printf("%d ",V->cycle[1][i]);
+    }
+printf("\n");
+
+
+
+printf("%d\n",V->vie);// vie par defaut
+printf("%d\n",V->vit);// vitesse du tire en case / seconde
+printf("%f\n",V->cad);// cadence de tire ex: 0.5
+printf("%c\n",V->tir);// apparence du tire
+printf("%d\n",V->deg);// 			les degats engendre
+
+int j;
+for(i=0;i<V->h;i++){
+for(j=0;j<V->l;j++){
+printf("%c",V->visuel[i][j]);// aparence du vaiseau
+}
+printf("\n");
+}
+printf("\n");
+
+
 free(V->cycle[0]);// free
 free(V->cycle[1]);
 free(V->cycle);
