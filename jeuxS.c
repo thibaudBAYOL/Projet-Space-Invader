@@ -8,7 +8,7 @@
 #include<poll.h>
 
 
-#include <fonction.h>
+#include "fonction.h"
 typedef struct Tire Tire;
 struct Tire {
 	int x;
@@ -18,8 +18,8 @@ struct Tire {
 	char visu;
 };
 
-int Tire(int x,int y,Type A,Tire* t){// Ajoute un tire en fonction de la categorie.
-int i=0
+void tire(int x,int y,Type A,Tire* t){// Ajoute un tire en fonction de la
+int i=0;
 	while(i<100 && t[i].cad!=0){
 		i++;
 	}
@@ -41,12 +41,12 @@ int i=0;int j;int x=t[i].x; int y=t[i].y;
 	cadre[y][x]=t[i].visu;
 	j=0;
 		while( !(vais[j].x<0) ){
-			if(vais[j].vie>0 && x>=vais[j].x && x<=vais[j].x+vais[j].l && y>=vais[j].x && y<=vais[j].x+vais[j].l){
+			if(vais[j].vie>0 && x>=vais[j].x && x<=vais[j].x+vais[j].cat.l && y>=vais[j].y && y<=vais[j].y+vais[j].cat.h){
 			 	vais[j].vie=vais[j].vie-t[i].dega;
 				t[i].cad=0;
 			 }else{
-				if( (time*t[i].cad)%2==0 ){
-					t[i].y=y-1
+				if( (int)(time*t[i].cad)%2==0 ){
+					t[i].y=y-1;
 					if (t[i].y<=0)t[i].cad=0;
 				}
 				}
@@ -60,7 +60,7 @@ int i=0;int j;int x=t[i].x; int y=t[i].y;
 
 
 
-int main(int argv, char*argc){
+int main(int argv, char**argc){
 
 char buf[1];
 //////////////////////////////////////POLL
@@ -71,7 +71,7 @@ int ret;
 fds[0].fd=0;
 fds[0].events=POLLIN;
 
-int a=0;int b=0;
+
 do{
 
 
