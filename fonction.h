@@ -30,6 +30,7 @@ struct Type{
     int h;// nb de case en hauteur
     int l;// nb de case en largeur
     char** visuel;// aparence du vaiseau
+    int index; //index
 };
 
 struct Vaisseau{

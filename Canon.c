@@ -11,7 +11,7 @@
   /* la configuration initiale a l'adresse prev */
   int non_canonique (struct termios *prev){
   struct termios new;
-    if (tcgetattr(fileno(stdin),prev)==-1) {
+    if (tcgetattr(fileno(stdin),prev)==-1){
       perror("tcgetattr");
       return -1;
     }
@@ -127,6 +127,9 @@
       }else if(c==100){//droite
         xVar++;
         design(carte, xVar, w);
+      } else if(c=='p'){
+        canonique(&prev);
+        return 0;
       }
       
       nb++;

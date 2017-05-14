@@ -15,6 +15,8 @@
 
 #include "fonction.h"
 
+#include <time.h>
+//#define BILLION  1000000000L;
 int lire(char** t);
 double lire2(char** t);
 Type* type01(int fd_v);
@@ -170,6 +172,7 @@ Type* type01(int fd_v){
 		vu[i]=h;
 	}
 	type1.visuel=vu;
+	type1.index = 0;
 	Type* type2=malloc(sizeof(Type));
 	*type2=type1;
 
@@ -203,7 +206,7 @@ Vaisseau** creeUneArmer(int* max /*, char* adresse */, Type** T){
 	/*maxi = taille du fichier ; cap = nombre de vaisseau*/
 	do{
 	 	vaiseaux[23]=i;
-	 	printf("%s\n", vaiseaux);
+	 	//printf("%s\n", vaiseaux);
 	//int i en char a ? //ou //char vaiseaux[10]=sprintf("vaiseaux%c",i);
 	 	fd_v=open(vaiseaux,O_RDONLY);
 			
@@ -216,21 +219,23 @@ Vaisseau** creeUneArmer(int* max /*, char* adresse */, Type** T){
 	 	if (fd_v!=-1){ 
 	 		cap=lire(&tab);
 
-			V[j]=malloc( (cap)*sizeof(Vaisseau) );
+			V[j]=malloc((cap+1)*sizeof(Vaisseau));
 
 			for (z=0;z<cap;z++){
-			V[j][z].cat=(*T[lire(&tab)]);
-			//printf("t1 : %d\n", V[j][z].temp);
-			V[j][z].temp=lire(&tab);
-			//printf("t2 : %d\n", V[j][z].temp);
-			//printf("x1 : %d\n", V[j][z].x);
-			V[j][z].x=lire(&tab);
-			//printf("x2 : %d\n", V[j][z].x);
-			//printf("y1 : %d\n", V[j][z].y);
-			V[j][z].y=lire(&tab);
-			//printf("y2 : %d\n", V[j][z].y);
-			V[j][z].vie=V[j][z].cat.vie;
+				V[j][z].cat=(*T[lire(&tab)]);
+				//printf("t1 : %d\n", V[j][z].temp);
+				V[j][z].temp=lire(&tab);
+				//printf("t2 : %d\n", V[j][z].temp);
+				//printf("x1 : %d\n", V[j][z].x);
+				V[j][z].x=lire(&tab);
+				//printf("x2 : %d\n", V[j][z].x);
+				//printf("y1 : %d\n", V[j][z].y);
+				V[j][z].y=lire(&tab);
+				//printf("y2 : %d\n", V[j][z].y);
+				V[j][z].vie=V[j][z].cat.vie;
 			}
+			V[j][z].x = -5;
+			V[j][z].y = -5;
 		} //else printf("sdfdfdfgd\n");
 	 	i++;j++;
 	 	close(fd_v);
@@ -243,9 +248,41 @@ return V;
 
 
 //////////////////////////TESTE/////////////////////////////////////
-/*
-int main(int argc, const char* argv[]){
 
+//int main(int argc, const char* argv[]){
+	/*
+	struct timespec start, stop;
+    double accum;
+
+    if( clock_gettime( CLOCK_REALTIME, &start) == -1 ){
+      perror( "clock gettime" );
+      exit( EXIT_FAILURE );
+    }
+
+//    system( argv[1] );
+sleep(1);
+    if( clock_gettime( CLOCK_REALTIME, &stop) == -1 ) {
+      perror( "clock gettime" );
+      exit( EXIT_FAILURE );
+    }
+
+    accum = ( stop.tv_sec - start.tv_sec )
+          + ( stop.tv_nsec - start.tv_nsec )
+            / BILLION;
+    printf( "%lf\n", accum );
+    */
+
+    /*
+time_t t;
+time(&t);
+printf("%ld\n", t);
+sleep(2);
+time(&t);
+printf("%ld\n", t);
+*/
+
+
+/*
 //  deroulement
 			printf("deroulement:\n");
 char* tab=deroulement();
@@ -342,8 +379,8 @@ printf("%c", vais[0][0].cat.visuel[2][3]);
 printf("\n");
 printf("%c", vais[0][0].cat.visuel[2][4]);
 //printf("\n");
-*//*
-return EXIT_SUCCESS;
-}*/
+*/
+//return EXIT_SUCCESS;
+//}
 
 
