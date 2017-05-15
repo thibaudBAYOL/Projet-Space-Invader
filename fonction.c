@@ -16,7 +16,7 @@
 #include "fonction.h"
 
 #include <time.h>
-//#define BILLION  1000000000L;
+#define BILLION  1000000000L
 int lire(char** t);
 double lire2(char** t);
 Type* type01(int fd_v);
@@ -189,6 +189,12 @@ Vaisseau** creeUneArmer(int* max /*, char* adresse */, Type** T){
 	char i='0';	 /* adresse */
 	char vaiseaux[]="space_invaders/niveaux/-";	
 
+	struct timespec cadOld1;
+	    if(clock_gettime( CLOCK_REALTIME, &cadOld1) == -1 ){
+	      perror( "clock gettime" );
+	      exit( EXIT_FAILURE );
+	    }
+
 	*max=0;
 	do{
 	 	vaiseaux[23]=i;
@@ -201,7 +207,7 @@ Vaisseau** creeUneArmer(int* max /*, char* adresse */, Type** T){
 		 }
 	}while(fd_v!=-1);
 
-	Vaisseau** V=malloc((*max)*sizeof(Vaisseau*));
+	Vaisseau** V=malloc((*max+1)*sizeof(Vaisseau*));
 	int j=0;i='0'; int maxi =0; int cap=0;int z=0;
 	/*maxi = taille du fichier ; cap = nombre de vaisseau*/
 	do{
@@ -232,7 +238,8 @@ Vaisseau** creeUneArmer(int* max /*, char* adresse */, Type** T){
 				//printf("y1 : %d\n", V[j][z].y);
 				V[j][z].y=lire(&tab);
 				//printf("y2 : %d\n", V[j][z].y);
-				V[j][z].vie=V[j][z].cat.vie;
+				V[j][z].ecran = 0;
+				V[j][z].cadOld = cadOld1;
 			}
 			V[j][z].x = -5;
 			V[j][z].y = -5;
@@ -240,11 +247,83 @@ Vaisseau** creeUneArmer(int* max /*, char* adresse */, Type** T){
 	 	i++;j++;
 	 	close(fd_v);
 	}while(j<(*max) && fd_v!=-1);
-
+V[j]=NULL;
 return V;
 }
 
 
+void tire(int x,int y,Vaisseau* A,int perso,Tire* t){// Ajoute un tire en fonction de la
+	
+	double accum;
+    struct timespec newTime;
+    if(clock_gettime( CLOCK_REALTIME, &newTime) == -1 ){
+      perror( "clock gettime" );
+      exit( EXIT_FAILURE );
+    }
+    accum = (double)(newTime.tv_sec - A->cadOld.tv_sec)+(double)(newTime.tv_nsec - A->cadOld.tv_nsec)/BILLION;
+
+	if ( accum >= 1./(A->cat.cad)){
+
+		int i=0;
+			while(i<100 && t[i].libre!=1){
+				i++;
+			}
+
+			if (i<100){
+				Tire T;
+				T.perso=perso;
+				T.libre=0;
+				T.x=x;
+				T.y=y;
+				T.dega=A->cat.deg;
+				T.visu=A->cat.tir;
+				T.vit=(1./(double)A->cat.vit);
+				T.last = newTime;
+				t[i]=T;
+			}
+	A->cadOld = newTime;
+	}
+	return;
+}
+
+void majTire(char** carte, Vaisseau*** coord, Tire* t, struct winsize w){// affiche le tire // retire la vie s'il touche un vaiseau// fin du parcour du tire// depalcement du tire.
+
+double accum;
+    struct timespec newTime;
+    if(clock_gettime( CLOCK_REALTIME, &newTime) == -1 ){
+      perror( "clock gettime" );
+      exit( EXIT_FAILURE );
+    }
+
+int i;int x; int y;
+	for(i=0;i<100;i++){	
+		if (t[i].libre==0){
+		accum = (double)(newTime.tv_sec - t[i].last.tv_sec)+(double)(newTime.tv_nsec - t[i].last.tv_nsec)/BILLION;
+		x=t[i].x;
+		y=t[i].y;
+			if( accum >=(t[i].vit) ){
+					if (t[i].perso==1){
+						t[i].y=y-1;
+					}else{
+						t[i].y=y+1;
+					}
+					t[i].last = newTime;
+					if (t[i].y<=0 && t[i].y >= w.ws_row-1) t[i].libre=1;
+			}
+			//x=t[i].x; 
+			if(t[i].y > 0 && t[i].y < w.ws_row-1){ 
+				y = t[i].y;
+				if(coord[y][x]!=NULL){
+				 	coord[y][x]->cat.vie=coord[y][x]->cat.vie-t[i].dega;
+					t[i].libre=1;
+				 }else if (y > 0 && y < w.ws_row-1){
+					carte[y][x]=t[i].visu;
+				}
+			}
+		}
+	}
+	return;
+}
 
 
 //////////////////////////TESTE/////////////////////////////////////
@@ -260,15 +339,17 @@ return V;
     }
 
 //    system( argv[1] );
-sleep(1);
+sleep(2);
+    for (int i = 0; i < 100000; ++i){
+    	i += 1;
+    	i -= 1;
+    }
     if( clock_gettime( CLOCK_REALTIME, &stop) == -1 ) {
       perror( "clock gettime" );
       exit( EXIT_FAILURE );
     }
-
-    accum = ( stop.tv_sec - start.tv_sec )
-          + ( stop.tv_nsec - start.tv_nsec )
-            / BILLION;
+//    printf("%lf\n", (double)stop.tv_nsec/BILLION);
+    accum = (double)(stop.tv_sec - start.tv_sec)+(double)(stop.tv_nsec - start.tv_nsec)/BILLION;
     printf( "%lf\n", accum );
     */
 
