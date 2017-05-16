@@ -362,7 +362,7 @@
     int n;
     fds[0].fd = 0;
     fds[0].events = POLLIN;
-    char buf[1];
+    char buf[3];
 
     int ret;
     while(1){
