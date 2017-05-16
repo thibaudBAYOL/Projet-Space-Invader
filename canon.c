@@ -14,6 +14,10 @@
 #define BILLION  1000000000L
 //#include <conio.h> //_getch()
 
+
+
+
+
   /* cette fonction reconfigure le terminal, et stocke */
   /* la configuration initiale a l'adresse prev */
   int non_canonique (struct termios *prev){
@@ -416,9 +420,9 @@
     time(&start);
 */
     int niv = 0;
-    Type** V1=type(&maxiV);
+    Type** V1=type(&maxiV,"space_invaders");
     //int nbTV = maxiV; // Nombre de types de vaisseaux
-    Vaisseau** vais = creeUneArmer(&maxiV,V1);
+    Vaisseau** vais = creeUneArmer(&maxiV,"space_invaders",V1);
     design(carte, coord, vais, &joueur, tires, &start, &told, xVar, niv, w);
 
 
@@ -449,7 +453,7 @@
                     majTire(carte, coord, tires);
                     show(carte, affiche, w);
                     if(ret == -4){ canonique(&prev); exit(0);}*/
-                  }else if(strcmp(buf, "p")==0){ 
+                  }else if(strcmp(buf, "p")==0){
                     canonique(&prev); exit(0);
                   }else if(strcmp(buf, "\n")==0){ 
                     canonique(&prev); exit(0);

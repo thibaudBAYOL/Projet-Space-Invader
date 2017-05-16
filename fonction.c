@@ -1,8 +1,7 @@
 /*
-#include <stdio.h>
+
 #include <stdlib.h>
 
-#include <string.h>
 
 
 #include <termios.h>
@@ -13,6 +12,11 @@
        #include <fcntl.h> // open
 */
 
+#include <sys/types.h>
+       #include <dirent.h>
+ #include <dirent.h>
+#include <string.h>
+#include <stdio.h>
 #include "fonction.h"
 
 #include <time.h>
@@ -23,13 +27,34 @@ Type* type01(int fd_v);
 
 
 
+char** findMods(){
+    struct dirent *d;
+    DIR *p = opendir("mods/");
+    int i=0;
+	char*tt[100];
+    while ((d=readdir(p))!=NULL){
+	 if(d->d_type == DT_DIR){
+		tt[i]=malloc((strlen(d->d_name))*sizeof(char) ); 
+                memcpy(tt[i],d->d_name,(strlen(d->d_name))*sizeof(char)),
+		i++;
+            }
+        }
+    char** mod=malloc(i*sizeof(char*));
+	 memcpy(mod,tt,i*sizeof(char*));
+
+   return  mod;
+}
+
+
 
 /*
 * 
 */
-char* deroulement(/* char* adresse? */){
+int* deroulement( char* adresse){// a utiliser dans l'armé
 			 /* adresse */
-	int fd_deroulement=open("space_invaders/deroulement",O_RDONLY);
+	char att[]="                                    ";
+	sprintf(att,"mods/%s/deroulement",adresse);
+	int fd_deroulement=open(att,O_RDONLY);
 	if (fd_deroulement==-1)exit(1);
 	int max = lseek(fd_deroulement,0,SEEK_END); max=max-15;
 	char totoNiveau[max];
@@ -42,12 +67,12 @@ char* deroulement(/* char* adresse? */){
 	for (i=0;i<max;i++){
 		if (totoNiveau[i]=='\n') cpt++;  /*cpt = Compteur de ligne du fichier déroulement*/
 	}
-	char* numNiveau= malloc( (cpt)*sizeof(char)); /*MODIF : (cpt+2)*sizeof(char)*/
+	int * numNiveau= malloc( (cpt)*sizeof(int)); /*MODIF : (cpt+2)*sizeof(char)*/
 	j=0;
-	for (i=0;i<=cpt+1 && j<=max;i++){
+	char* tt=totoNiveau;
+	for (i=0;i<=cpt+1 && tt[0]!='\0';i++){
 		if (j>max)break;
-		numNiveau[i]=totoNiveau[j];// (si <10)   /*numNiveau = contient les numéros des niveaux présent dans le fichier déroulement*/
-		j=j+2;
+		numNiveau[i]=lire(&tt);// (si <10)   /*numNiveau = contient les numéros des niveaux présent dans le fichier déroulement*/
 	}
 return numNiveau; /*Retourne le tableau de niveaux*/
 }
@@ -87,14 +112,17 @@ return rep;
 * Renvoi un double tableaux avec tous les types existantes de vaisseaux
 */
 
-Type** type(int* max /*, char* adresse */ ){
+Type** type(int* max , char* adresse  ){
 	int fd_v=-1;
-	char i='0';	 /* adresse */
-	char vaiseaux[]="space_invaders/vaisseaux/-";
-
+	//char i='0';	 /* adresse */
+	int i=0;
+	//char vaiseaux[]="mods/space_invaders/vaisseaux/-";
+	char vaiseaux[]="                                         ";
+	
 	*max=0;
 	do{ /*vérifie l'ouverture des fichiers de type de vaisseaux et renvoi le nombre dans max*/
-	 	vaiseaux[25]=i;
+	 //	vaiseaux[30]=i;
+	sprintf(vaiseaux,"mods/%s/vaisseaux/%d",adresse,i);
 	//int i en char a ? //ou //char vaiseaux[10]=sprintf("vaiseaux%c",i);
 	 	fd_v=open(vaiseaux,O_RDONLY);
 	 	if (fd_v!=-1){
@@ -105,9 +133,11 @@ Type** type(int* max /*, char* adresse */ ){
 	}while(fd_v!=-1);
 
 	Type** types=malloc((*max)*sizeof(Type*));
-	int j=0;i='0';
+	int j=0;//i='0';
+	i=0;
 	do{
-	 	vaiseaux[25]=i;
+	 //	vaiseaux[30]=i;
+	sprintf(vaiseaux,"mods/%s/vaisseaux/%d",adresse,i);
 	//int i en char a ? //ou //char vaiseaux[10]=sprintf("vaiseaux%c",i);
 	 	fd_v=open(vaiseaux,O_RDONLY);
 	 	if (fd_v!=-1){
@@ -184,11 +214,13 @@ Type* type01(int fd_v){
 * Type **T = tous les types de vaisseaux
 */
 
-Vaisseau** creeUneArmer(int* max /*, char* adresse */, Type** T){	
+Vaisseau** creeUneArmer(int* max , char* adresse , Type** T){	
 	int fd_v=-1;
-	char i='0';	 /* adresse */
-	char vaiseaux[]="space_invaders/niveaux/-";	
-
+	//char i='0';	 /* adresse */
+	int i=0; int*tab=deroulement(adresse);
+	//char vaiseaux[]="space_invaders/niveaux/-";	
+	char vaiseaux[]="                                   ";
+	sprintf(vaiseaux,"mods/%s/niveaux/%d",adresse,tab[i]);
 	struct timespec cadOld1;
 	    if(clock_gettime( CLOCK_REALTIME, &cadOld1) == -1 ){
 	      perror( "clock gettime" );
@@ -197,7 +229,8 @@ Vaisseau** creeUneArmer(int* max /*, char* adresse */, Type** T){
 
 	*max=0;
 	do{
-	 	vaiseaux[23]=i;
+	// 	vaiseaux[23]=i;
+	sprintf(vaiseaux,"mods/%s/niveaux/%d",adresse,tab[i]);
 	//int i en char a ? //ou //char vaiseaux[10]=sprintf("vaiseaux%c",i);
 	 	fd_v=open(vaiseaux,O_RDONLY);
 	 	if (fd_v!=-1){
@@ -208,10 +241,11 @@ Vaisseau** creeUneArmer(int* max /*, char* adresse */, Type** T){
 	}while(fd_v!=-1);
 
 	Vaisseau** V=malloc((*max+1)*sizeof(Vaisseau*));
-	int j=0;i='0'; int maxi =0; int cap=0;int z=0;
+	int j=0;/*i='0';*/i=0; int maxi =0; int cap=0;int z=0;
 	/*maxi = taille du fichier ; cap = nombre de vaisseau*/
 	do{
-	 	vaiseaux[23]=i;
+	 //	vaiseaux[23]=i;
+		sprintf(vaiseaux,"mods/%s/niveaux/%d",adresse,tab[i]);
 	 	//printf("%s\n", vaiseaux);
 	//int i en char a ? //ou //char vaiseaux[10]=sprintf("vaiseaux%c",i);
 	 	fd_v=open(vaiseaux,O_RDONLY);

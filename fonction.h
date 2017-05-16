@@ -54,12 +54,12 @@ struct Vaisseau{
     struct timespec cadOld;
 };
 
+//"space_invaders"
+Type** type(int* max , char* adresse );
 
-Type** type(int* max /*, char* adresse */);
+int* deroulement(char* adresse);
 
-char* deroulement(void /* char* adresse? */);
-
-Vaisseau** creeUneArmer(int* max /*, char* adresse */, Type** T);
+Vaisseau** creeUneArmer(int* max , char* adresse , Type** T);
 
 void tire(int x,int y,Vaisseau* A,int perso,Tire* t);
 
