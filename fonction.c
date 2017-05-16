@@ -41,7 +41,7 @@ char** findMods(){
         }
     char** mod=malloc(i*sizeof(char*));
 	 memcpy(mod,tt,i*sizeof(char*));
-
+	
    return  mod;
 }
 
@@ -115,10 +115,16 @@ return rep;
 Type** type(int* max , char* adresse  ){
 	int fd_v=-1;
 	//char i='0';	 /* adresse */
-	int i=0;
+	int i;
 	//char vaiseaux[]="mods/space_invaders/vaisseaux/-";
 	char vaiseaux[]="                                         ";
 	
+struct dirent *d;
+	sprintf(vaiseaux,"mods/%s/vaisseaux/",adresse);
+    DIR *p = opendir(vaiseaux);
+    if ((d=readdir(p))!=NULL){ i=atoi(d->d_name);}
+	
+
 	*max=0;
 	do{ /*vérifie l'ouverture des fichiers de type de vaisseaux et renvoi le nombre dans max*/
 	 //	vaiseaux[30]=i;

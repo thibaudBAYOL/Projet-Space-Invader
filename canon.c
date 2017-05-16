@@ -417,12 +417,12 @@
     time_t told;
     time(&told);
     time_t start;
-    time(&start);
+    time(&start);// char** mod=finddir(); while(1){    
 */
     int niv = 0;
-    Type** V1=type(&maxiV,"space_invaders");
+    Type** V1=type(&maxiV,"space_invaders");//mod[m]
     //int nbTV = maxiV; // Nombre de types de vaisseaux
-    Vaisseau** vais = creeUneArmer(&maxiV,"space_invaders",V1);
+    Vaisseau** vais = creeUneArmer(&maxiV,"space_invaders",V1);//mod[m]
     design(carte, coord, vais, &joueur, tires, &start, &told, xVar, niv, w);
 
 
@@ -430,34 +430,32 @@
     int n;
     fds[0].fd = 0;
     fds[0].events = POLLIN;
-    char buf[1];
+    char buf[3];
 
     int ret;
     while(1){
         poll(fds,1,10);
         
             if(fds[0].revents & POLLIN){
-                if((n=read(fds[0].fd, buf, 1))>0){    //while((n=read(fds[0].fd, buf, 1))>0){
+                if((n=read(fds[0].fd, buf, 3))>0){    //while((n=read(fds[0].fd, buf, 1))>0){
                   //write(STDOUT_FILENO, buf, n);
-                  if(strcmp(buf, "q")==0){ 
+                  if(buf[0]==27 && buf[1]==91 && buf[2]==68){//strcmp(buf, "q")==0){ 
                     xVar--;
                     if(xVar < 0+3) xVar++; //Evite le débordement
                     /*ret = design(carte, coord, vais, &start, &told, xVar, w);
                     majTire(carte, coord, tires);
                     show(carte, affiche, w);
                     if(ret == -4){ canonique(&prev); exit(0);}*/
-                  }else if(strcmp(buf, "d")==0){
+                  }else if(buf[0]==27 && buf[1]==91 && buf[2]==67){//strcmp(buf, "d")==0){
                     xVar++;
                     if(xVar > w.ws_col-4) xVar--; //Evite le débordement
                     /*ret = design(carte, coord, vais, &start, &told, xVar, w);
                     majTire(carte, coord, tires);
                     show(carte, affiche, w);
                     if(ret == -4){ canonique(&prev); exit(0);}*/
-                  }else if(strcmp(buf, "p")==0){
+                  }else if(buf[0]==27 && buf[1]==91 && buf[2]==66){//strcmp(buf, "p")==0){
                     canonique(&prev); exit(0);
-                  }else if(strcmp(buf, "\n")==0){ 
-                    canonique(&prev); exit(0);
-                  }else if(strcmp(buf, " ")==0){ 
+                  }else if(buf[0]==27 && buf[1]==91 && buf[2]==65){//strcmp(buf, " ")==0){ 
                     tire(xVar,(w.ws_row-4),&joueur,1,tires);//canonique(&prev); exit(0);
                   }
                 }
@@ -468,9 +466,9 @@
             if(ret == -4){ canonique(&prev); exit(0); 
             }else if(ret == -3){
               while((n=read(fds[0].fd, buf, 1))>0){
-                if(strcmp(buf, "p")==0){
+                if(buf[0]==27 && buf[1]==91 && buf[2]==66){//strcmp(buf, "p")==0){
                   canonique(&prev); exit(0);
-                }else if(strcmp(buf, "\n")==0){
+                }else if(buf[0]==27 && buf[1]==91 && buf[2]!=66){//strcmp(buf, "\n")==0){
                   if( clock_gettime( CLOCK_REALTIME, &start) == -1 ){
                     perror( "clock gettime" );
                     exit( EXIT_FAILURE );
@@ -489,7 +487,7 @@
             }
     }
 
-
+//m++;}
 
     
     if (canonique(&prev)==-1)
