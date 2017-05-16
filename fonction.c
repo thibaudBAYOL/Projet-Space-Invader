@@ -239,6 +239,7 @@ Vaisseau** creeUneArmer(int* max /*, char* adresse */, Type** T){
 				V[j][z].y=lire(&tab);
 				//printf("y2 : %d\n", V[j][z].y);
 				V[j][z].ecran = 0;
+				V[j][z].player = 0;
 				V[j][z].cadOld = cadOld1;
 			}
 			V[j][z].x = -5;
@@ -251,6 +252,13 @@ V[j]=NULL;
 return V;
 }
 
+void liberer(Tire* t){
+	int i = 0;
+	for(i = 0; i < 100; ++i){
+		t[i].libre = 1;
+	}
+	return;
+}
 
 void tire(int x,int y,Vaisseau* A,int perso,Tire* t){// Ajoute un tire en fonction de la
 	
@@ -301,15 +309,16 @@ int i;int x; int y;
 		accum = (double)(newTime.tv_sec - t[i].last.tv_sec)+(double)(newTime.tv_nsec - t[i].last.tv_nsec)/BILLION;
 		x=t[i].x;
 		y=t[i].y;
-			if( accum >=(t[i].vit) ){
+			if( accum >= (t[i].vit) ){
 					if (t[i].perso==1){
 						t[i].y=y-1;
 					}else{
 						t[i].y=y+1;
 					}
 					t[i].last = newTime;
-					if (t[i].y<=0 && t[i].y >= w.ws_row-1) t[i].libre=1;
+					
 			}
+			if (t[i].y<=1 || t[i].y >= w.ws_row-1){ t[i].libre=1;}
 			//x=t[i].x; 
 			if(t[i].y > 0 && t[i].y < w.ws_row-1){ 
 				y = t[i].y;
@@ -325,10 +334,178 @@ int i;int x; int y;
 	return;
 }
 
+int melange(int a, int b) {
+ return rand()%(b-a)+a;
+}
 
+void powerUpdate(char** carte, Vaisseau*** coord, Vaisseau* joueur, Power* powerUp, struct winsize w){
+	//powerLanch(powerUp, w);
+	if((*powerUp).libre == 0){	
+		int x,y;
+		x = powerUp->x;
+		y = powerUp->y;
+		int power = (*powerUp).pow;
+		carte[y][x-1] = '('; 
+			if(power == 1){
+				carte[y][x] = 'V';
+			}else if(power == 2){
+				carte[y][x] = 'D';
+			}else if(power == 3){
+				carte[y][x] = 'C';
+			}else if(power == 4){
+				carte[y][x] = 'S';
+			}
+		carte[y][x+1] = ')';
+		
+		int vrai = 0;
+		if((coord[y][x-1] != NULL) || (coord[y][x] != NULL) || (coord[y][x+1] != NULL)){
+			if(coord[y][x-1] != NULL){ if (coord[y][x-1]->player == 1){x = x-1; vrai = 1;}}
+			if(coord[y][x] != NULL){ if (coord[y][x]->player == 1){ vrai = 1;}}
+			if(coord[y][x+1] != NULL){ if (coord[y][x+1]->player == 1){x = x+1; vrai = 1;}} 
+			if(vrai == 1){
+				if(power == 1){
+					coord[y][x]->cat.vie = coord[y][x]->cat.vie + (*powerUp).valeur; 
+				}else if(power == 2){
+					coord[y][x]->cat.deg = coord[y][x]->cat.deg + (*powerUp).valeur;
+				}else if(power == 3){
+					coord[y][x]->cat.cad = coord[y][x]->cat.cad + (*powerUp).v_cad;
+				}else if(power == 4){
+					coord[y][x]->cat.vit = coord[y][x]->cat.vit + (*powerUp).valeur;
+				}
+				(*powerUp).libre = 1;
+				vrai = 0;
+			}
+		}
+		if(y < w.ws_row-2) powerUp->y += 1;
+		double accum;
+		struct timespec pNow;
+	    if(clock_gettime( CLOCK_REALTIME, &pNow) == -1 ){
+	      perror( "clock gettime" );
+	      exit( EXIT_FAILURE );
+	    }
+	    accum = (double)(pNow.tv_sec - powerUp->tStart.tv_sec)+(double)(pNow.tv_nsec - powerUp->tStart.tv_nsec)/BILLION;
+	    if(accum >= 3.0){
+	    	(*powerUp).libre = 1;
+	    }
+	}
+	return;
+}
+
+void powerLanch(Power* powerUp, struct winsize w){
+	int rnd = melange(0, 100);
+	if ((powerUp->libre == 1) && (rnd < 10)){
+		Power powUp;
+		powUp.x = melange(3, (w.ws_col-6));
+		powUp.y = w.ws_row-4;
+		powUp.pow = melange(1,5); //entre 1 et 4 (5 exclusif)
+		if((powUp.pow == 2)||(powUp.pow == 4)){
+			powUp.valeur = melange(1,4);
+		}else if(powUp.pow == 1){
+			powUp.valeur = 1;
+		}else{
+			powUp.valeur = 0;
+			powUp.v_cad = 0.5;
+		}
+		struct timespec pTime;
+	    if(clock_gettime( CLOCK_REALTIME, &pTime) == -1 ){
+	      perror( "clock gettime" );
+	      exit( EXIT_FAILURE );
+	    }
+	    powUp.tStart = pTime;
+		/*char* vu = malloc(sizeof(char)*4);
+		vu[0] = '(';vu[2] = ')';
+		if((powUp.pow == 1)){
+			vu[1] = 'V';
+		}else if((powUp.pow == 2)){
+			vu[1] = 'D';
+		}else if((powUp.pow == 3)){
+			vu[1] = 'C';
+		}else {
+			vu[1] = 'S';
+		}
+		powUp.visuel = vu;*/
+		powUp.libre = 0;
+		(*powerUp) = powUp;
+	}
+	return;
+}
+
+void infos(char** carte, Vaisseau* player, struct winsize w, int n){
+	int i,j,vit,deg,vie;
+	double cad;
+	char c = '1';
+	i = 0;
+	while(i < n){
+		c++;
+		i++;
+	}
+	vit = player->cat.vit;
+	char cvit[3];
+	sprintf(cvit, "%d", vit);
+	deg = player->cat.deg;
+	char cdeg[3];
+	sprintf(cdeg, "%d", deg);
+	cad = player->cat.cad;
+	char ccad[7];
+	sprintf(ccad, "%.1f", cad);
+	vie = player->cat.vie;
+	char cvie[3];
+	sprintf(cvie, "%d", vie);
+	
+    for (i = 0; i < w.ws_row/2; ++i){
+      for (j = 0; j < w.ws_col; ++j){
+
+      	if(i == 1 && j == 14 ){
+          carte[i][j-9] = 'v';carte[i][j-8] = 'i';carte[i][j-7] = 't';carte[i][j-6] = 'e';
+          carte[i][j-5] = 's';carte[i][j-4] = 's';carte[i][j-3] = 'e';carte[i][j-2] = ':';
+          carte[i][j-1] = cvit[0];if(vit > 9) carte[i][j] = cvit[1];
+        }
+
+        if(i == 2 && j == 12 ){
+          carte[i][j-7] = 'd';carte[i][j-6] = 'e';carte[i][j-5] = 'g';carte[i][j-4] = 'a';
+          carte[i][j-3] = 't';carte[i][j-2] = ':';carte[i][j-1] = cdeg[0];if(deg > 9) carte[i][j] = cdeg[1];
+        }
+
+        if(i == 1 && j == (w.ws_col/2)+4){
+          carte[i][j-7] = 'L';carte[i][j-6] = 'e';carte[i][j-5] = 'v';carte[i][j-4] = 'e';
+          carte[i][j-3] = 'l';carte[i][j-2] = ' ';carte[i][j-1] = c;//carte[i][j] = 'N';
+        }
+
+        if(i == 1 && j == w.ws_col-6 ){
+       	  if(cad < 10.){ carte[i][j-11] = ccad[0];carte[i][j-10] = '.';carte[i][j-9] = ccad[2];}
+       	  else if(cad >= 10.){ carte[i][j-12] = ccad[0];carte[i][j-11] = ccad[1];carte[i][j-10] = '.';carte[i][j-9] = ccad[3];}
+       	  carte[i][j-8] = ':';
+          carte[i][j-7] = 'c';carte[i][j-6] = 'a';carte[i][j-5] = 'd';carte[i][j-4] = 'e';
+          carte[i][j-3] = 'n';carte[i][j-2] = 's';carte[i][j-1] = 'e';carte[i][j] = ' ';
+          //carte[i][j] = ' ';
+        }
+
+        if(i == 2 && j == w.ws_col-4 ){
+          carte[i][j-8] = cvie[0];if(vie > 9) carte[i][j-7] = cvie[1];carte[i][j-6] = ':';
+          carte[i][j-5] = 'v';carte[i][j-4] = 'i';carte[i][j-3] = 'e';carte[i][j-2] = ' ';
+          carte[i][j-1] = ' ';//carte[i][j-2] = ' ';carte[i][j-1] = c;//carte[i][j] = 'N';
+        }
+      }
+    }
+	return;
+}
 //////////////////////////TESTE/////////////////////////////////////
 
 //int main(int argc, const char* argv[]){
+/*	double a1 = 8.5;
+    double a2 = 15.3;
+    char ca1[5];
+    char ca2[5];
+    sprintf(ca1, "%.1f", a1);
+    sprintf(ca2, "%.1f", a2);
+    printf("%s\n", ca1);
+    printf("%s\n", ca2);
+*/
+	/*srand(time(NULL));
+	for (int i = 0; i < 10; ++i){
+		printf("%d\n", melange(1,4));
+	}*/
+	
 	/*
 	struct timespec start, stop;
     double accum;

@@ -17,6 +17,7 @@
 typedef struct Vaisseau Vaisseau;
 typedef struct Type Type;
 typedef struct Tire Tire;
+typedef struct Power Power;
 
 struct Type{
     int vit;// vitesse du tire en case / seconde
@@ -50,8 +51,20 @@ struct Vaisseau{
     int y;
     int temp;
     int ecran;// temps avant son apparition;
+    int player;
     Type cat;// la categorie de vaiseau (cat: 1, 2, ...)
     struct timespec cadOld;
+};
+
+struct Power{
+    int x;//position x,y
+    int y;
+    int pow; //1,2,3,4;
+    int valeur;
+    double v_cad;
+    struct timespec tStart;
+    //char* visuel;
+    int libre;// temps avant son apparition;
 };
 
 
@@ -65,6 +78,15 @@ void tire(int x,int y,Vaisseau* A,int perso,Tire* t);
 
 void majTire(char** carte,Vaisseau*** coord, Tire* t, struct winsize w);
 
+void infos(char** carte, Vaisseau* joueur, struct winsize w, int n);
+
+int melange(int a, int b);
+
+void liberer(Tire* t);
+
+void powerUpdate(char** carte, Vaisseau*** coord, Vaisseau* joueur, Power* powerUp, struct winsize w);
+
+void powerLanch(Power* powerUp, struct winsize w);
 
 #endif
 

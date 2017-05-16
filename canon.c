@@ -170,11 +170,21 @@
           carte[i][j] = '*';
         }else{
           carte[i][j] = ' ';
-          coord[i][j] = NULL; //sécurité
+          coord[i][j] = NULL; //sécurité pour supprimer les vaisseaux
         }
-        if(i == w.ws_row/2 && j == (w.ws_col/2)+4){
-          carte[i][j-7] = 'G';carte[i][j-6] = 'A';carte[i][j-5] = 'M';carte[i][j-4] = 'E';
-          carte[i][j-3] = ' ';carte[i][j-2] = 'W';carte[i][j-1] = 'O';carte[i][j] = 'N';
+        if(i == (w.ws_row/2)+3 && j == (w.ws_col/2)+8){
+          carte[i-4][j-13] = 'L';carte[i-4][j-12] = 'e';carte[i-4][j-11] = 'v';carte[i-4][j-10] = 'e';
+          carte[i-4][j-9] = 'l';carte[i-4][j-8] = ' ';carte[i-4][j-7] = 'f';carte[i-4][j-6] = 'i';
+          carte[i-4][j-5] = 'n';carte[i-4][j-4] = 'i';carte[i-4][j-3] = 's';carte[i-4][j-2] = 'h';
+
+          carte[i-2][j-16] = '<';carte[i-2][j-15] = ',';carte[i-2][j-14] = '^';carte[i-2][j-13] = ',';
+          carte[i-2][j-12] = '>';carte[i-2][j-11] = ' ';carte[i-2][j-10] = 't';carte[i-2][j-9] = 'o';
+          carte[i-2][j-8] = ' ';carte[i-2][j-7] = 'c';carte[i-2][j-6] = 'o';carte[i-2][j-5] = 'n';
+          carte[i-2][j-4] = 't';carte[i-2][j-3] = 'i';carte[i-2][j-2] = 'n';carte[i-2][j-1] = 'u';carte[i-2][j] = 'e';
+
+          carte[i][j-11] = 'v';
+          carte[i][j-10] = ' ';carte[i][j-9] = 't';carte[i][j-8] = 'o';carte[i][j-7] = ' ';
+          carte[i][j-6] = 'q';carte[i][j-5] = 'u';carte[i][j-4] = 'i';carte[i][j-3] = 't';     
         }
       }
     }
@@ -237,7 +247,7 @@
     Type** V1=type(&maxiV);
     Vaisseau** vais = creeUneArmer(&maxiV,V1);*/
     ret = vaisseaux(carte, coord, vais, tires, start, told, niv, w);
-    if (ret == -3){ if (gamewon(carte, coord, w) == -4) return -3;}
+    if (ret == -3){ liberer(tires); if (gamewon(carte, coord, w) == -4) return -3;}
 
     //Test de collision ici !!!
     //Dessin du vaisseau joueur
@@ -290,6 +300,8 @@
   /* exemple d'utilisation */
   int main (int argc,char *argv[]){
 
+
+  srand(time(NULL));
   struct termios prev;
   //int nb,c;
   //pour récupérer la taille du terminal
@@ -381,10 +393,12 @@
 
     Vaisseau joueur;
     joueur.cat.vit = 20;
-    joueur.cat.cad = 4.; //double
+    joueur.cat.cad = 9.5; //double
     joueur.cat.tir = '^';
     joueur.cat.deg = 20;
     joueur.cat.vie = 3;
+    joueur.player = 1;
+
     struct timespec cadOld1;
     if(clock_gettime( CLOCK_REALTIME, &cadOld1) == -1 ){
       perror( "clock gettime" );
@@ -399,7 +413,9 @@
     }
 
     int maxiV;
-    
+    Power powerUp;
+    powerUp.libre = 1;
+  
     struct timespec start, told;
     if( clock_gettime( CLOCK_REALTIME, &start) == -1 ){
       perror( "clock gettime" );
@@ -455,14 +471,20 @@
                     canonique(&prev); exit(0);
                   }else if(strcmp(buf, " ")==0){ 
                     tire(xVar,(w.ws_row-4),&joueur,1,tires);//canonique(&prev); exit(0);
+                    powerLanch(&powerUp, w);
                   }
                 }
             }
             ret = design(carte, coord, vais, &joueur, tires, &start, &told, xVar, niv, w);
             majTire(carte, coord, tires, w);
+            
+            
+            infos(carte, &joueur, w, niv);
+            powerUpdate(carte, coord, &joueur, &powerUp, w);
             show(carte, affiche, w);
             if(ret == -4){ canonique(&prev); exit(0); 
             }else if(ret == -3){
+              powerUp.libre=1; //Le faire passer dans design pour le liberer juste avant le gamewon pour eviter de l'afficher sur l'ecran de gameover.
               while((n=read(fds[0].fd, buf, 1))>0){
                 if(strcmp(buf, "p")==0){
                   canonique(&prev); exit(0);
