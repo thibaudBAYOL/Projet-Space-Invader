@@ -40,7 +40,7 @@ struct Tire {
     int perso;
     int x;
     int y;
-    int dega;// vie en moin
+    int dega;// vie en moins
     double vit;
     char visu;
     struct timespec last;

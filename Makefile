@@ -8,11 +8,11 @@ default: app.exe
 fonction.o: fonction.c fonction.h
 	$(CC) $(CFLAGS) -o fonction.o -c fonction.c
 
-canon.o: canon.c fonction.h
-	$(CC) $(CFLAGS) -o canon.o -c canon.c
+jeux.o: jeux.c fonction.h
+	$(CC) $(CFLAGS) -o jeux.o -c jeux.c
 
-app.exe: canon.o fonction.o
-	$(CC) $(CFLAGS) -o app.exe canon.o fonction.o
+app.exe: jeux.o fonction.o
+	$(CC) $(CFLAGS) -o app.exe jeux.o fonction.o
 
 clean:
 	rm *.o
