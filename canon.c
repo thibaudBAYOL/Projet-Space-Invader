@@ -46,7 +46,7 @@
     int ind,taille;
     int k = 0;
     while(troup[niv][k].x != -5){
-      //if(troup[niv][k].ecran == 1){
+      //if(troup[niv][k].ecran == 1){                             //A ACTIVER SI ON DES CHANGEMENT ASYNCHRONE
         ind = troup[niv][k].cat.index;
         taille = troup[niv][k].cat.lcycle;
         if((troup[niv][k].cat.cycle[0][ind] == -1) && (troup[niv][k].cat.cycle[1][ind] == -1)){            //Vérification du déplacement x
@@ -110,20 +110,12 @@
       exit( EXIT_FAILURE );
     }
     accum = (double)(tnew.tv_sec - (*told).tv_sec)+(double)(tnew.tv_nsec - (*told).tv_nsec)/BILLION;
-/*
-    time_t tnew;
-    time(&tnew);
-*/
+
     if(accum >= 0.25){ //Si la différence est supérieure ou égale à 1 seconde, on bouge les vaisseaux
         changePos(troup, niv);
         *told = tnew;
     }
-    //int k = 0;
-    //k = 0;
-/*
-    time_t tnewCheck;
-    time(&tnewCheck);
-*/
+
     int kill = 0;
     double accum2;
     struct timespec tnewCheck;
@@ -139,15 +131,12 @@
         int x = troup[niv][k].x;
         for (i = 0; i < troup[niv][k].cat.h; i++){
           for (j = 0; j < troup[niv][k].cat.l; j++){
-            //printf("%c", troup[niv][0].cat.visuel[i][j]);
+
             carte[y+i][x+j] = troup[niv][k].cat.visuel[i][j];
             coord[y+i][x+j] = &(troup[niv][k]);
-            //x++;
+
           }
-          
-          //x = troup[niv][0].cat.x;
-          //y++;
-            //printf("\n");
+
         }
         if(troup[niv][k].ecran == 0) troup[niv][k].ecran = 1;
         tire((x+(x+j))/2, (y+i), &(troup[niv][k]), 0, tires);
@@ -296,8 +285,6 @@
   }
 
 
-
-  /* exemple d'utilisation */
   int main (int argc,char *argv[]){
 
 
@@ -323,73 +310,6 @@
     coord[z] = malloc(sizeof(char*)*w.ws_col);
   }
   int xVar = w.ws_col/2;
-  //int i;
-/*
-  int i,j;
-  for (i = 0; i < w.ws_row; ++i){
-    for (j = 0; j < w.ws_col; ++j){
-      if(j < 2  || j > (w.ws_col-3) || i < 1 || i > (w.ws_row-2)){
-        carte[i][j] = '*';
-      }else{
-        carte[i][j] = ' ';
-      }
-      if(i == (w.ws_row-3) && j == w.ws_col/2){
-        carte[i][j] = '*';
-      }
-      if(i == (w.ws_row-2)){
-        if(j == (w.ws_col/2-1) || j == (w.ws_col/2) || j == (w.ws_col/2+1)){
-          carte[i][j] = '*';
-        }
-      }
-    }
-  }
-*/
-    //char test[10];
-      /*
-      printf ("lines %d\n", w.ws_row);
-      printf ("columns %d\n", w.ws_col);
-      */
-/*
-    for(nb=0;;){
-
-      show(carte, affiche, w);
-      
-      //for(i = 0; i < w.ws_row; ++i){
-        //printf("%s", carte[i]);
-      //}
-                                                          //read(0, test, 3);
-                                                          //if(test=="a") printf("gauche\n");
-                                                          //if(test=="p") printf("droite\n");
-                                                          //printf("%s\n", test);
-                                                          //int ch1 = getch();
-
-      c=getchar();
-      if(c==113){ //gauche
-        xVar--;
-        design(carte, xVar, w);
-      }else if(c==100){//droite
-        xVar++;
-        design(carte, xVar, w);
-      } else if(c=='p'){
-        canonique(&prev);
-        return 1;
-      }
-      
-      nb++;
-                                                          
-                                                          //(void) printf("carac[%d]=(%d,%o,%x)",nb,c,c,c);
-                                                          //if (c==127) {
-                                                            //printf(" char=DEL\n%d caracteres\n",nb);
-                                                            //break;
-                                                          //}
-                                                          //if (c>=32)
-                                                            //printf(" char=%c\n",c);
-                                                          //else
-                                                            //printf("\n");
-                                                          
-    }
-*/
-
 
     Vaisseau joueur;
     joueur.cat.vit = 20;
@@ -449,27 +369,25 @@
         poll(fds,1,10);
         
             if(fds[0].revents & POLLIN){
-                if((n=read(fds[0].fd, buf, 1))>0){    //while((n=read(fds[0].fd, buf, 1))>0){
+                if((n=read(fds[0].fd, buf, 3))>0){    //while((n=read(fds[0].fd, buf, 1))>0){
                   //write(STDOUT_FILENO, buf, n);
-                  if(strcmp(buf, "q")==0){ 
+                  if(buf[0]==27 && buf[1]==91 && buf[2]==68){ 
                     xVar--;
                     if(xVar < 0+3) xVar++; //Evite le débordement
                     /*ret = design(carte, coord, vais, &start, &told, xVar, w);
                     majTire(carte, coord, tires);
                     show(carte, affiche, w);
                     if(ret == -4){ canonique(&prev); exit(0);}*/
-                  }else if(strcmp(buf, "d")==0){
+                  }else if(buf[0]==27 && buf[1]==91 && buf[2]==67){//strcmp(buf, "d")==0){
                     xVar++;
                     if(xVar > w.ws_col-4) xVar--; //Evite le débordement
                     /*ret = design(carte, coord, vais, &start, &told, xVar, w);
                     majTire(carte, coord, tires);
                     show(carte, affiche, w);
                     if(ret == -4){ canonique(&prev); exit(0);}*/
-                  }else if(strcmp(buf, "p")==0){ 
+                  }else if(buf[0]==27 && buf[1]==91 && buf[2]==66){//strcmp(buf, "p")==0){
                     canonique(&prev); exit(0);
-                  }else if(strcmp(buf, "\n")==0){ 
-                    canonique(&prev); exit(0);
-                  }else if(strcmp(buf, " ")==0){ 
+                  }else if(buf[0]==27 && buf[1]==91 && buf[2]==65){//strcmp(buf, " ")==0){ 
                     tire(xVar,(w.ws_row-4),&joueur,1,tires);//canonique(&prev); exit(0);
                     powerLanch(&powerUp, w);
                   }
@@ -485,10 +403,10 @@
             if(ret == -4){ canonique(&prev); exit(0); 
             }else if(ret == -3){
               powerUp.libre=1; //Le faire passer dans design pour le liberer juste avant le gamewon pour eviter de l'afficher sur l'ecran de gameover.
-              while((n=read(fds[0].fd, buf, 1))>0){
-                if(strcmp(buf, "p")==0){
+              while((n=read(fds[0].fd, buf, 3))>0){
+                if(buf[0]==27 && buf[1]==91 && buf[2]==66){//strcmp(buf, "p")==0){
                   canonique(&prev); exit(0);
-                }else if(strcmp(buf, "\n")==0){
+                }else if(buf[0]==27 && buf[1]==91 && buf[2]!=66){//strcmp(buf, "\n")==0){
                   if( clock_gettime( CLOCK_REALTIME, &start) == -1 ){
                     perror( "clock gettime" );
                     exit( EXIT_FAILURE );
@@ -502,13 +420,11 @@
             if(vais[niv] == NULL) { 
               if(gameend(carte, coord, w) == -4){
                   show(carte, affiche, w);
+                  //if (canonique(&prev)==-1) exit(0);
               } 
               break; 
             }
     }
-
-
-
     
     if (canonique(&prev)==-1)
       return 1;
